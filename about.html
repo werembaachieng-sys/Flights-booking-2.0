@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Get to know SkyWing, a friendly flight-booking demo for planning sample journeys.">
+  <title>About SkyWing · Plan a little adventure</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 1.5rem;
+      color: #0a1e3c;
+      background:
+        radial-gradient(ellipse at 8% 8%, rgba(108, 157, 238, 0.18), transparent 28rem),
+        radial-gradient(ellipse at 95% 85%, rgba(75, 181, 190, 0.12), transparent 26rem),
+        linear-gradient(145deg, #f0f4ff 0%, #e9f0fa 100%);
+    }
+
+    .page-card {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(1.2rem, 4vw, 3rem);
+      overflow: hidden;
+      border-radius: 2rem;
+      background: #fff;
+      box-shadow: 0 30px 70px -35px rgba(0, 20, 50, 0.38), 0 8px 24px -16px rgba(0, 20, 50, 0.18);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      color: #0a1e3c;
+      font-size: 1.6rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .logo i {
+      padding: 0.65rem;
+      border-radius: 16px;
+      background: #e0edff;
+      color: #1e3a8a;
+    }
+
+    nav {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    nav a {
+      padding: 0.65rem 1rem;
+      border-radius: 30px;
+      color: #2c3e50;
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: #1e3a8a;
+      background: #edf3fd;
+    }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(230px, 0.7fr);
+      align-items: center;
+      gap: 2rem;
+      min-height: 350px;
+      padding: clamp(2rem, 5vw, 4rem);
+      overflow: hidden;
+      border-radius: 1.8rem;
+      color: #fff;
+      isolation: isolate;
+      background:
+        radial-gradient(ellipse at 78% 12%, rgba(132, 196, 255, 0.38), transparent 23rem),
+        linear-gradient(125deg, #081d43 0%, #153e82 55%, #246bc5 100%);
+      box-shadow: 0 24px 55px -30px rgba(14, 53, 117, 0.75);
+    }
+
+    .hero::before {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.55) 1px, transparent 1px);
+      background-size: 34px 34px;
+      opacity: 0.12;
+      content: "";
+    }
+
+    .hero::after {
+      position: absolute;
+      z-index: -1;
+      right: -100px;
+      bottom: -240px;
+      width: 500px;
+      height: 500px;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 45px rgba(255,255,255,.04), 0 0 0 90px rgba(255,255,255,.035);
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+    }
+
+    .ticket {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 30px;
+      background: rgba(255,255,255,.08);
+      color: #dceaff;
+      font-size: 0.78rem;
+      font-weight: 750;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 650px;
+      margin-bottom: 1rem;
+      font-size: clamp(2.4rem, 5vw, 4.2rem);
+      letter-spacing: -2px;
+      line-height: 1.05;
+    }
+
+    .hero-copy p {
+      max-width: 620px;
+      color: #e1ebff;
+      font-size: 1.05rem;
+      line-height: 1.75;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 1.4rem;
+      padding: 0.9rem 1.2rem;
+      border-radius: 40px;
+      background: white;
+      color: #1e3a8a;
+      font-weight: 750;
+      text-decoration: none;
+      box-shadow: 0 10px 24px rgba(4,20,58,.18);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(4,20,58,.26);
+    }
+
+    .cta:focus-visible,
+    nav a:focus-visible,
+    .logo:focus-visible {
+      outline: 3px solid #79d4df;
+      outline-offset: 4px;
+    }
+
+    .ticket {
+      justify-self: center;
+      width: min(100%, 300px);
+      padding: 1.5rem;
+      transform: rotate(4deg);
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 1.4rem;
+      background: rgba(255,255,255,.97);
+      box-shadow: 0 24px 55px rgba(4,20,58,.28);
+      color: #0a1e3c;
+      animation: ticket-drift 6s ease-in-out infinite;
+    }
+
+    .ticket small {
+      color: #6e7e94;
+      font-weight: 750;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .route {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin: 1.2rem 0;
+    }
+
+    .route strong {
+      display: block;
+      font-size: 1.6rem;
+    }
+
+    .route span {
+      color: #6e7e94;
+      font-size: 0.78rem;
+    }
+
+    .route i {
+      flex: 1;
+      color: #2b6ed7;
+      text-align: center;
+    }
+
+    .ticket-note {
+      padding-top: 0.9rem;
+      border-top: 1px dashed #d9e3f0;
+      color: #49627e;
+      font-size: 0.82rem;
+    }
+
+    @keyframes ticket-drift {
+      0%, 100% { transform: rotate(4deg) translateY(0); }
+      50% { transform: rotate(2deg) translateY(-8px); }
+    }
+
+    .journey-choices {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .journey-choice {
+      position: relative;
+      display: block;
+      min-height: 170px;
+      padding: 1.35rem;
+      overflow: hidden;
+      border: 1px solid #e6edf6;
+      border-radius: 1.2rem;
+      background: linear-gradient(145deg, #fff, #f6f9ff);
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .journey-choice:hover {
+      transform: translateY(-4px);
+      border-color: #c7daf0;
+      box-shadow: 0 16px 30px -20px rgba(17, 58, 122, 0.45);
+    }
+
+    .journey-choice:focus-visible {
+      outline: 3px solid #79a9e8;
+      outline-offset: 3px;
+    }
+
+    .journey-choice::after {
+      position: absolute;
+      right: -26px;
+      bottom: -45px;
+      width: 120px;
+      height: 120px;
+      border: 1px solid #e6edf6;
+      border-radius: 50%;
+      box-shadow: 0 0 0 15px #f8faff, 0 0 0 16px #edf3fd;
+      content: "";
+    }
+
+    .journey-choice-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+      color: #8092aa;
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .journey-choice-top i {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border-radius: 13px;
+      background: #e8f0ff;
+      color: #1e3a8a;
+      font-size: 1rem;
+    }
+
+    .journey-choice h3 {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 0.35rem;
+      font-size: 1.05rem;
+    }
+
+    .journey-choice p {
+      position: relative;
+      z-index: 1;
+      max-width: 250px;
+      color: #647991;
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .section-heading {
+      max-width: 680px;
+      margin: 3rem auto 1.5rem;
+      text-align: center;
+    }
+
+    .section-heading span {
+      color: #2b6ed7;
+      font-size: 0.76rem;
+      font-weight: 750;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+
+    .section-heading h2 {
+      margin: 0.45rem 0;
+      font-size: clamp(1.7rem, 3vw, 2.4rem);
+      letter-spacing: -0.8px;
+    }
+
+    .section-heading p {
+      color: #647991;
+      line-height: 1.7;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .feature {
+      display: block;
+      padding: 1.4rem;
+      border: 1px solid #e6edf6;
+      border-radius: 1.2rem;
+      background: linear-gradient(145deg, #fff, #f8faff);
+      box-shadow: 0 8px 22px -20px rgba(0, 35, 75, 0.5);
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .feature:hover {
+      transform: translateY(-3px);
+      border-color: #cadcf2;
+      box-shadow: 0 18px 30px -24px rgba(0, 35, 75, 0.55);
+    }
+
+    .feature:focus-visible {
+      outline: 3px solid #79a9e8;
+      outline-offset: 3px;
+    }
+
+    .feature-icon {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      margin-bottom: 1rem;
+      place-items: center;
+      border-radius: 15px;
+      background: #e8f0ff;
+      color: #1e3a8a;
+      font-size: 1.1rem;
+    }
+
+    .feature h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    .feature p,
+    .fine-print {
+      color: #647991;
+      font-size: 0.93rem;
+      line-height: 1.65;
+    }
+
+    .fine-print {
+      margin-top: 1.5rem;
+      padding: 1rem 1.2rem;
+      border-left: 4px solid #80a9e8;
+      border-radius: 0 0.8rem 0.8rem 0;
+      background: #f3f7ff;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.3rem;
+      border-top: 1px solid #e0eaf5;
+      color: #5e738b;
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: #1e3a8a;
+    }
+
+    footer a:focus-visible {
+      outline: 3px solid #79a9e8;
+      outline-offset: 3px;
+    }
+
+    footer i {
+      margin-right: 0.35rem;
+      color: #2b6ed7;
+    }
+
+    @media (max-width: 760px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 2rem;
+      }
+
+      .ticket {
+        justify-self: start;
+        width: min(100%, 360px);
+        transform: rotate(2deg);
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .journey-choices {
+        grid-template-columns: 1fr;
+      }
+
+      .journey-choice {
+        min-height: 145px;
+      }
+    }
+
+    @media (max-width: 550px) {
+      body { padding: 0.75rem; }
+      .page-card { padding: 1rem; border-radius: 1.3rem; }
+      header { align-items: flex-start; flex-direction: column; }
+      nav { width: 100%; }
+      nav a { flex: 1; text-align: center; }
+      .hero { padding: 1.5rem; }
+      h1 { letter-spacing: -1px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-card">
+    <header>
+      <a class="logo" href="./index.html" aria-label="SkyWing home">
+        <i class="fas fa-plane-departure" aria-hidden="true"></i>
+        <span>SkyWing</span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="./index.html">Flights</a>
+        <a class="active" href="./about.html" aria-current="page">About</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow"><i class="fas fa-compass" aria-hidden="true"></i> Your next adventure, made simple</span>
+        <h1>A simpler start to your next trip.</h1>
+        <p>Big trip energy. Small first step. Shape a journey that feels like yours, explore sample flights, and see an estimated total before you make any real-world plans.</p>
+        <a class="cta" href="./index.html"><i class="fas fa-search" aria-hidden="true"></i> Start exploring</a>
+      </div>
+      <div class="ticket" role="img" aria-label="Sample flight ticket from Nairobi to London">
+        <small>Your next little getaway</small>
+        <div class="route">
+          <div><strong>NBO</strong><span>Nairobi</span></div>
+          <i class="fas fa-plane" aria-hidden="true"></i>
+          <div><strong>LHR</strong><span>London</span></div>
+        </div>
+        <div class="ticket-note"><i class="fas fa-sun" aria-hidden="true"></i> Window seat. New views. Your call.</div>
+      </div>
+    </section>
+
+    <section class="journey-choices" aria-label="Ways to plan your trip">
+      <a class="journey-choice" href="./index.html?tripType=one-way">
+        <div class="journey-choice-top"><span>01 · Go your way</span><i class="fas fa-arrow-right" aria-hidden="true"></i></div>
+        <h3>One way</h3>
+        <p>Pick a destination and leave the return date open.</p>
+      </a>
+      <a class="journey-choice" href="./index.html?tripType=round-trip">
+        <div class="journey-choice-top"><span>02 · There and back</span><i class="fas fa-sync-alt" aria-hidden="true"></i></div>
+        <h3>Return</h3>
+        <p>Choose your outbound and return dates together.</p>
+      </a>
+      <a class="journey-choice" href="./index.html?tripType=multi-city">
+        <div class="journey-choice-top"><span>03 · Take the scenic route</span><i class="fas fa-route" aria-hidden="true"></i></div>
+        <h3>Multi-city</h3>
+        <p>Build a journey with multiple stops, one flight at a time.</p>
+      </a>
+    </section>
+
+    <section aria-labelledby="how-title">
+      <div class="section-heading">
+        <span id="how-title">How it works</span>
+        <h2>From daydream to trip plan in three steps.</h2>
+        <p>Everything you need to explore an idea is together on the Flights page. No account or checkout needed.</p>
+      </div>
+      <div class="features">
+        <a class="feature" href="./index.html#flight-search">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <h3>Set your trip</h3>
+          <p>Choose one way, return, or multi-city. Add your destinations and dates, then select up to four travelers.</p>
+        </a>
+        <a class="feature" href="./index.html#flight-results">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <h3>Compare your options</h3>
+          <p>Press “Search flights” to see sample Kenya Airways and Jambojet-with-partners options, including times, stops, and estimated fares.</p>
+        </a>
+        <a class="feature" href="./index.html#reservation-panel">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <h3>Preview the cost</h3>
+          <p>Choose a flight to see your route, dates, traveler count, and estimated total. Change your trip details anytime and compare again.</p>
+        </a>
+      </div>
+    </section>
+
+    <section aria-labelledby="benefits-title">
+      <div class="section-heading">
+        <span id="benefits-title">Why SkyWing</span>
+        <h2>Planning that feels lighter.</h2>
+        <p>A useful, low-pressure way to think through a journey before you make real travel plans.</p>
+      </div>
+      <div class="features">
+        <a class="feature" href="./index.html#flight-results">
+          <div class="feature-icon"><i class="fas fa-eye" aria-hidden="true"></i></div>
+          <h3>Clear costs</h3>
+          <p>See sample fares and an estimated total for your traveler count. Multi-city totals are estimates across the segments you add.</p>
+        </a>
+        <a class="feature" href="./index.html#flight-search">
+          <div class="feature-icon"><i class="fas fa-sliders-h" aria-hidden="true"></i></div>
+          <h3>Flexible planning</h3>
+          <p>Try different dates, routes, or traveler counts without losing sight of the options you are comparing.</p>
+        </a>
+        <a class="feature" href="./index.html#reservation-panel">
+          <div class="feature-icon"><i class="fas fa-heart" aria-hidden="true"></i></div>
+          <h3>No-pressure preview</h3>
+          <p>Explore the booking flow without signing up or entering payment details. Choosing a flight only creates an on-screen sample summary.</p>
+        </a>
+      </div>
+      <p class="fine-print"><strong>Demo details:</strong> SkyWing is a demonstration. Flight times and prices are estimates for illustration, not live airline schedules or bookable fares. No booking, payment, or ticket is issued.</p>
+      <div style="text-align:center">
+        <a class="cta" href="./index.html"><i class="fas fa-plane" aria-hidden="true"></i> Start planning a flight</a>
+      </div>
+    </section>
+
+    <footer>
+      <span><i class="fas fa-heart" aria-hidden="true"></i> Made for the joy of getting away.</span>
+      <a class="support-link" href="tel:+254781149405"><i class="fas fa-headset" aria-hidden="true"></i> Questions? +254781149405</a>
+    </footer>
+  </main>
+</body>
+</html>

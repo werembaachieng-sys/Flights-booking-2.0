@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyWing · Flight Booking</title>
+  <!-- Font Awesome for icons (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ----- RESET & GLOBAL ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f0f4ff 0%, #e9f0fa 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    /* main card – all content in one page */
+    .booking-card {
+      max-width: 1280px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 2.5rem;
+      box-shadow: 0 30px 50px -20px rgba(0, 20, 40, 0.25), 0 10px 20px -8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      padding: 2rem 2rem 2.5rem;
+      transition: all 0.2s;
+    }
+
+    /* ----- HEADER ----- */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo {
+      text-decoration: none;
+    }
+
+    .nav-links a {
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-links a {
+      color: #2c3e50;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.65rem 1rem;
+      border-radius: 30px;
+    }
+
+    .nav-links a.active,
+    .nav-links a:hover {
+      color: #1e3a8a;
+      background: #edf3fd;
+    }
+
+    .nav-links a:focus-visible,
+    .trip-type-option:focus-within,
+    .search-btn:focus-visible,
+    .book-btn:focus-visible,
+    .multi-city-actions button:focus-visible,
+    .remove-leg-btn:focus-visible {
+      outline: 3px solid #78a9ee;
+      outline-offset: 3px;
+    }
+
+    .trip-type-options {
+      flex: 1 0 100%;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      border: 0;
+      padding: 0.4rem 0 0.7rem;
+    }
+
+    .trip-type-options legend {
+      width: 100%;
+      margin-bottom: 0.2rem;
+      color: #6e7e94;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .trip-type-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 0.85rem;
+      border: 1px solid #dfe8f3;
+      border-radius: 30px;
+      color: #49627e;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s, border-color 0.2s;
+    }
+
+    .trip-type-option:has(input:checked) {
+      border-color: #b7ccef;
+      background: #edf3fd;
+      color: #1e3a8a;
+    }
+
+    .trip-type-option input {
+      accent-color: #1e3a8a;
+    }
+
+    .multi-city-fields {
+      flex: 1 0 100%;
+      min-width: 0;
+      border: 0;
+      padding: 0;
+    }
+
+    .multi-city-legs {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .multi-city-leg {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.75rem;
+      border: 1px solid #e6edf6;
+      border-radius: 1rem;
+    }
+
+    .multi-city-leg .search-field {
+      min-width: 0;
+      padding: 0.45rem 0.2rem;
+    }
+
+    .multi-city-leg input {
+      min-width: 0;
+    }
+
+    .multi-city-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .multi-city-actions button,
+    .remove-leg-btn {
+      border: 1px solid #dfe8f3;
+      border-radius: 2rem;
+      background: #fff;
+      color: #1e3a8a;
+      font: inherit;
+      font-weight: 600;
+      padding: 0.55rem 0.85rem;
+      cursor: pointer;
+    }
+
+    .multi-city-actions button:disabled,
+    .remove-leg-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .multi-city-hint {
+      color: #6e7e94;
+      font-size: 0.85rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .logo i {
+      font-size: 2.2rem;
+      color: #1e3a8a;
+      background: #e0edff;
+      padding: 0.55rem;
+      border-radius: 18px;
+      box-shadow: 0 6px 12px -6px rgba(0, 50, 100, 0.2);
+    }
+
+    .logo span {
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #0a1e3c;
+    }
+
+    .logo span i {
+      font-size: 0.9rem;
+      background: none;
+      color: #2b6ed7;
+      padding: 0;
+      margin-left: 4px;
+      box-shadow: none;
+    }
+
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 1.8rem;
+      color: #2c3e50;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .trust-badge i {
+      color: #0c6b4b;
+      margin-right: 0.3rem;
+      font-size: 1rem;
+    }
+
+    /* ----- BOOKING FORM (SEARCH) ----- */
+    .search-panel {
+      background: linear-gradient(145deg, #ffffff, #fbfdff);
+      border-radius: 1.7rem;
+      padding: 1.25rem;
+      box-shadow: 0 16px 38px -25px rgba(0, 35, 70, 0.3), 0 0 0 1px rgba(0, 50, 120, 0.06);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.8rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid #e6edf6;
+    }
+
+    .search-field {
+      display: flex;
+      align-items: center;
+      flex: 1 1 160px;
+      min-width: 0;
+      gap: 0.65rem;
+      padding: 0.8rem 0.9rem;
+      border: 1px solid #e7eef7;
+      border-radius: 1rem;
+      background: #f8faff;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-field:focus-within {
+      border-color: #9bb9e7;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(43, 110, 215, 0.1);
+    }
+
+    .search-field i {
+      color: #3b6ab0;
+      font-size: 1.2rem;
+      width: 1.6rem;
+      text-align: center;
+    }
+
+    .search-field .field-content {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .passenger-counts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.55rem;
+    }
+
+    .passenger-counts label {
+      min-width: 0;
+      font-size: 0.64rem;
+      letter-spacing: 0;
+    }
+
+    .passenger-counts input {
+      min-width: 0;
+      font-size: 0.85rem;
+      cursor: text;
+    }
+
+    .passenger-hint {
+      display: block;
+      margin-top: 0.4rem;
+      color: #6e7e94;
+      font-size: 0.72rem;
+      line-height: 1.35;
+    }
+
+    .search-field label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #6e7e94;
+      margin-bottom: 2px;
+    }
+
+    .search-field input,
+    .search-field select {
+      border: none;
+      background: transparent;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #0f1f35;
+      outline: none;
+      padding: 0.1rem 0;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .search-field input::placeholder {
+      color: #9aaec2;
+      font-weight: 400;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .search-field select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%233b6ab0" d="M6 8L2 4h8z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 0 center;
+      background-size: 12px;
+      padding-right: 18px;
+    }
+
+    .divider-vertical {
+      display: none;
+    }
+
+    .search-btn {
+      background: linear-gradient(135deg, #214ba2, #173779);
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 1rem 1.7rem;
+      border-radius: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+      box-shadow: 0 12px 22px -12px #1e3a8a;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    .search-btn i {
+      font-size: 1.1rem;
+    }
+
+    .search-btn:hover {
+      background: linear-gradient(135deg, #173779, #102858);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 26px -14px #1e3a8a;
+    }
+
+    /* ----- FLIGHT RESULTS / LISTINGS ----- */
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .results-heading-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .results-header h2 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: #0b1f3a;
+      letter-spacing: -0.6px;
+    }
+
+    .results-subtitle {
+      color: #6e7e94;
+      font-size: 0.92rem;
+    }
+
+    .results-header h2 i {
+      color: #2b6ed7;
+      margin-right: 8px;
+      font-size: 1.4rem;
+    }
+
+    .results-header .sort-badge {
+      background: #edf7f2;
+      padding: 0.55rem 0.9rem;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 650;
+      color: #176345;
+    }
+
+    .flight-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .flight-item {
+      background: linear-gradient(145deg, #fff, #fcfdff);
+      border-radius: 1.45rem;
+      padding: 1.3rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      box-shadow: 0 8px 24px -20px rgba(0, 20, 40, 0.45);
+      border: 1px solid #e9eff7;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .flight-item:hover {
+      transform: translateY(-2px);
+      border-color: #c7daf0;
+      box-shadow: 0 16px 30px -20px rgba(0, 60, 130, 0.3);
+      background: #fff;
+    }
+
+    .airline-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 180px;
+    }
+
+    .airline-icon {
+      background: linear-gradient(145deg, #eaf1fd, #dceaff);
+      width: 54px;
+      height: 54px;
+      border-radius: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #1e3a8a;
+    }
+
+    .airline-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #0d213b;
+    }
+
+    .flight-number {
+      font-size: 0.8rem;
+      color: #6e8baa;
+      font-weight: 500;
+      margin-top: 4px;
+      letter-spacing: 0.2px;
+    }
+
+    .flight-route {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .departure, .arrival {
+      text-align: center;
+      min-width: 90px;
+    }
+
+    .time {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #0c1e38;
+      letter-spacing: -0.3px;
+    }
+
+    .airport-code {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2b6ed7;
+      margin-top: 3px;
+      letter-spacing: 0.3px;
+    }
+
+    .flight-duration {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #6f8ba8;
+      font-size: 0.8rem;
+      font-weight: 500;
+      gap: 4px;
+    }
+
+    .flight-duration i {
+      font-size: 1rem;
+      color: #3b7bc9;
+    }
+
+    .flight-price {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #0b2b4f;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .flight-price span {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #6f8ba8;
+      letter-spacing: 0;
+    }
+
+    .book-btn {
+      background: #edf3fd;
+      border: none;
+      padding: 0.7rem 1.6rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #1e3a8a;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    .book-btn i {
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+
+    .book-btn:hover {
+      background: #1e3a8a;
+      color: white;
+      border-color: #1e3a8a;
+      transform: translateY(-1px);
+    }
+
+    .book-btn:hover i {
+      transform: translateX(3px);
+    }
+
+    /* ----- FOOTER / TRUST ----- */
+    .footer-note {
+      margin-top: 2.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.9rem;
+      color: #5e738b;
+      border-top: 1px solid #e0eaf5;
+      padding-top: 1.5rem;
+    }
+
+    .booking-status {
+      margin: 0 0 1rem;
+      padding: 0.9rem 1rem;
+      border-radius: 0.9rem;
+      background: #edf7f2;
+      color: #14583e;
+      line-height: 1.5;
+    }
+
+    .booking-status:empty {
+      display: none;
+    }
+
+    .booking-status.error {
+      background: #fff1f0;
+      color: #9c2f26;
+    }
+
+    .reservation-panel {
+      margin-top: 1.5rem;
+      padding: 1.4rem;
+      border: 1px solid #e6edf6;
+      border-radius: 1.4rem;
+      background: #f8fbff;
+    }
+
+    .reservation-panel h2 {
+      color: #0b1f3a;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .reservation-panel p {
+      color: #5e738b;
+      line-height: 1.5;
+    }
+
+    .reservation-summary {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid #dfe8f3;
+      border-radius: 1rem;
+      background: #fff;
+      font-weight: 600;
+      color: #1e3a8a !important;
+    }
+
+    .booking-steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin: 1.25rem 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .booking-steps li {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4rem;
+      color: #7a8ba0;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .booking-steps li:not(:last-child)::after {
+      position: absolute;
+      top: 1rem;
+      left: 2rem;
+      right: 0.5rem;
+      height: 2px;
+      background: #dfe8f3;
+      content: "";
+      transform: translateY(-50%);
+    }
+
+    .booking-steps li.is-complete:not(:last-child)::after {
+      background: #2b6ed7;
+    }
+
+    .booking-step-number {
+      z-index: 1;
+      display: inline-flex;
+      width: 2rem;
+      height: 2rem;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #dfe8f3;
+      border-radius: 50%;
+      background: #fff;
+      color: inherit;
+    }
+
+    .booking-steps li.is-current {
+      color: #1e3a8a;
+    }
+
+    .booking-steps li.is-current .booking-step-number,
+    .booking-steps li.is-complete .booking-step-number {
+      border-color: #1e3a8a;
+      background: #1e3a8a;
+      color: #fff;
+    }
+
+    .booking-confirmation {
+      margin-top: 1.25rem;
+      padding: 1rem;
+      border: 1px solid #b8dfcd;
+      border-radius: 1rem;
+      background: #edf7f2;
+      color: #14583e;
+    }
+
+    .booking-confirmation h3 {
+      margin-bottom: 0.35rem;
+      font-size: 1.05rem;
+    }
+
+    .booking-confirmation p {
+      color: inherit;
+    }
+
+    .traveler-details {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid #e0eaf5;
+    }
+
+    .traveler-details h3 {
+      color: #0b1f3a;
+      font-size: 1.05rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .traveler-details > p {
+      margin-bottom: 1rem;
+    }
+
+    .traveler-fields,
+    .contact-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+      gap: 0.85rem;
+    }
+
+    .traveler-fields {
+      margin-bottom: 1rem;
+    }
+
+    .traveler-card {
+      min-width: 0;
+      padding: 1rem;
+      border: 1px solid #dfe8f3;
+      border-radius: 1rem;
+      background: #fff;
+    }
+
+    .traveler-card h4 {
+      margin-bottom: 0.8rem;
+      color: #0b1f3a;
+    }
+
+    .traveler-preferences {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .traveler-details label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      color: #49627e;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .traveler-details input,
+    .traveler-details select {
+      width: 100%;
+      min-height: 2.8rem;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid #dfe8f3;
+      border-radius: 0.7rem;
+      background: #fff;
+      color: #0f1f35;
+      font: inherit;
+    }
+
+    .date-picker-control {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .traveler-details .date-picker-control input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .date-picker-button {
+      display: grid;
+      flex: 0 0 2.8rem;
+      place-items: center;
+      min-height: 2.8rem;
+      padding: 0.5rem;
+      border: 1px solid #dfe8f3;
+      border-radius: 0.7rem;
+      background: #edf3fd;
+      color: #1e3a8a;
+      cursor: pointer;
+    }
+
+    .traveler-details .checkbox-label {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .traveler-details .checkbox-label input {
+      width: 1.1rem;
+      min-height: 1.1rem;
+      height: 1.1rem;
+      margin: 0;
+      accent-color: #1e3a8a;
+    }
+
+    .traveler-details input:focus-visible,
+    .traveler-details select:focus-visible,
+    .date-picker-button:focus-visible,
+    .confirm-booking-btn:focus-visible {
+      outline: 3px solid #78a9ee;
+      outline-offset: 2px;
+    }
+
+    .preference-note {
+      margin: 0 0 1rem;
+      color: #6e7e94 !important;
+      font-size: 0.88rem;
+    }
+
+    .confirm-booking-btn {
+      margin-top: 1rem;
+      padding: 0.75rem 1.1rem;
+      border: 0;
+      border-radius: 2rem;
+      background: #1e3a8a;
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .confirm-booking-btn:hover {
+      background: #173779;
+    }
+
+    .secure-badge i {
+      color: #0f7b5a;
+      margin-right: 6px;
+    }
+
+    .contact-support i {
+      color: #2b6ed7;
+      margin-right: 6px;
+    }
+
+    /* ----- RESPONSIVE TWEAKS ----- */
+    @media (max-width: 900px) {
+      .booking-card { padding: 1.5rem; }
+      .search-panel { flex-direction: column; align-items: stretch; padding: 1.2rem; }
+      .search-field { flex: 1 1 auto; }
+      .divider-vertical { display: none; }
+      .multi-city-leg { grid-template-columns: 1fr; }
+      .remove-leg-btn { justify-self: start; }
+      .search-btn { margin-left: 0; justify-content: center; }
+      .flight-item { flex-direction: column; align-items: flex-start; }
+      .flight-route { width: 100%; justify-content: space-between; }
+      .flight-price { width: 100%; justify-content: space-between; }
+    }
+
+    @media (max-width: 550px) {
+      .header { flex-direction: column; align-items: flex-start; }
+      .trust-badge { width: 100%; justify-content: space-between; }
+      .nav-links { width: 100%; }
+      .nav-links a { flex: 1; text-align: center; }
+      .trip-type-option { flex: 1 1 auto; justify-content: center; }
+      .results-header { align-items: flex-start; flex-direction: column; }
+      .flight-route { flex-direction: column; gap: 0.5rem; }
+      .flight-price { flex-wrap: wrap; }
+      .flight-price .book-btn { margin-left: auto; }
+      .booking-steps li { font-size: 0.78rem; }
+      .booking-steps li:not(:last-child)::after { right: 0.25rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="booking-card">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-plane-departure"></i>
+        <span>SkyWing <i class="fas fa-bolt"></i></span>
+      </div>
+      <div class="trust-badge">
+        <span><i class="fas fa-search"></i> Compare fares</span>
+        <span><i class="fas fa-clock"></i> 24/7 support</span>
+      </div>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a class="active" href="./index.html" aria-current="page">Flights</a>
+        <a href="./about.html">About SkyWing</a>
+      </nav>
+    </div>
+
+    <!-- Flight search form -->
+    <form class="search-panel" id="flight-search">
+      <fieldset class="trip-type-options">
+        <legend>Choose your trip</legend>
+        <label class="trip-type-option"><input type="radio" name="tripType" value="one-way" checked> One way</label>
+        <label class="trip-type-option"><input type="radio" name="tripType" value="round-trip"> Return</label>
+        <label class="trip-type-option"><input type="radio" name="tripType" value="multi-city"> Multi-city</label>
+      </fieldset>
+      <div class="search-field single-trip-field">
+        <i class="fas fa-map-marker-alt"></i>
+        <div class="field-content">
+          <label for="origin">From</label>
+          <input id="origin" name="origin" type="text" list="origin-airport-options" placeholder="City or airport" value="Nairobi (NBO)" required>
+        </div>
+      </div>
+      <div class="divider-vertical single-trip-divider"></div>
+      <div class="search-field single-trip-field">
+        <i class="fas fa-map-marker-alt"></i>
+        <div class="field-content">
+          <label for="destination">To</label>
+          <select id="destination" name="destination" required>
+            <option value="Addis Ababa, Ethiopia (ADD)">Addis Ababa, Ethiopia</option>
+            <option value="Entebbe, Uganda (EBB)">Entebbe, Uganda</option>
+            <option value="Kigali, Rwanda (KGL)">Kigali, Rwanda</option>
+            <option value="Dar es Salaam, Tanzania (DAR)">Dar es Salaam, Tanzania</option>
+            <option value="Johannesburg, South Africa (JNB)">Johannesburg, South Africa</option>
+            <option value="Cape Town, South Africa (CPT)">Cape Town, South Africa</option>
+            <option value="Cairo, Egypt (CAI)">Cairo, Egypt</option>
+            <option value="Lagos, Nigeria (LOS)">Lagos, Nigeria</option>
+            <option value="Accra, Ghana (ACC)">Accra, Ghana</option>
+            <option value="Doha, Qatar (DOH)">Doha, Qatar</option>
+            <option value="Dubai, United Arab Emirates (DXB)">Dubai, United Arab Emirates</option>
+            <option value="Istanbul, Turkey (IST)">Istanbul, Turkey</option>
+            <option value="Mumbai, India (BOM)">Mumbai, India</option>
+            <option value="New Delhi, India (DEL)">New Delhi, India</option>
+            <option value="London Heathrow, United Kingdom (LHR)" selected>London Heathrow, United Kingdom</option>
+            <option value="London Gatwick, United Kingdom (LGW)">London Gatwick, United Kingdom</option>
+            <option value="Paris Charles de Gaulle, France (CDG)">Paris Charles de Gaulle, France</option>
+            <option value="Amsterdam, Netherlands (AMS)">Amsterdam, Netherlands</option>
+            <option value="Frankfurt, Germany (FRA)">Frankfurt, Germany</option>
+            <option value="Rome, Italy (FCO)">Rome, Italy</option>
+            <option value="Singapore (SIN)">Singapore</option>
+            <option value="Bangkok, Thailand (BKK)">Bangkok, Thailand</option>
+            <option value="Tokyo Haneda, Japan (HND)">Tokyo Haneda, Japan</option>
+            <option value="New York JFK, United States (JFK)">New York, United States</option>
+            <option value="Toronto, Canada (YYZ)">Toronto, Canada</option>
+          </select>
+        </div>
+      </div>
+      <datalist id="origin-airport-options">
+        <option value="Nairobi (NBO)">
+        <option value="Mombasa (MBA)">
+        <option value="Addis Ababa, Ethiopia (ADD)">
+        <option value="Entebbe, Uganda (EBB)">
+        <option value="Kigali, Rwanda (KGL)">
+        <option value="Dar es Salaam, Tanzania (DAR)">
+      </datalist>
+      <datalist id="destination-airport-options">
+        <option value="Addis Ababa, Ethiopia (ADD)">
+        <option value="Entebbe, Uganda (EBB)">
+        <option value="Kigali, Rwanda (KGL)">
+        <option value="Dar es Salaam, Tanzania (DAR)">
+        <option value="Johannesburg, South Africa (JNB)">
+        <option value="Cape Town, South Africa (CPT)">
+        <option value="Cairo, Egypt (CAI)">
+        <option value="Lagos, Nigeria (LOS)">
+        <option value="Accra, Ghana (ACC)">
+        <option value="Doha, Qatar (DOH)">
+        <option value="Dubai, United Arab Emirates (DXB)">
+        <option value="Istanbul, Turkey (IST)">
+        <option value="Mumbai, India (BOM)">
+        <option value="New Delhi, India (DEL)">
+        <option value="London Heathrow, United Kingdom (LHR)">
+        <option value="London Gatwick, United Kingdom (LGW)">
+        <option value="Paris Charles de Gaulle, France (CDG)">
+        <option value="Amsterdam, Netherlands (AMS)">
+        <option value="Frankfurt, Germany (FRA)">
+        <option value="Rome, Italy (FCO)">
+        <option value="Singapore (SIN)">
+        <option value="Bangkok, Thailand (BKK)">
+        <option value="Tokyo Haneda, Japan (HND)">
+        <option value="New York JFK, United States (JFK)">
+        <option value="Toronto, Canada (YYZ)">
+      </datalist>
+      <div class="divider-vertical single-trip-divider"></div>
+      <div class="search-field single-trip-field">
+        <i class="fas fa-calendar-alt"></i>
+        <div class="field-content">
+          <label for="depart-date">Depart</label>
+          <input id="depart-date" name="departDate" type="date" required>
+        </div>
+      </div>
+      <div class="divider-vertical return-divider single-trip-divider" hidden></div>
+      <div class="search-field return-field" hidden>
+        <i class="fas fa-calendar-check"></i>
+        <div class="field-content">
+          <label for="return-date">Return</label>
+          <input id="return-date" name="returnDate" type="date">
+        </div>
+      </div>
+      <fieldset class="multi-city-fields" id="multi-city-fields" hidden>
+        <legend class="multi-city-hint">Add 2 to 6 flight segments</legend>
+        <div class="multi-city-legs" id="multi-city-legs"></div>
+        <div class="multi-city-actions">
+          <button type="button" id="add-leg-btn"><i class="fas fa-plus"></i> Add flight</button>
+          <span class="multi-city-hint" id="leg-count" aria-live="polite"></span>
+        </div>
+      </fieldset>
+      <div class="divider-vertical"></div>
+      <div class="search-field">
+        <i class="fas fa-user"></i>
+        <div class="field-content">
+          <div class="passenger-counts">
+            <label for="adult-count">Adults 12+
+              <input id="adult-count" name="adults" type="number" min="1" step="1" value="1" required>
+            </label>
+            <label for="child-count">Children 2–11
+              <input id="child-count" name="children" type="number" min="0" step="1" value="0" required>
+            </label>
+            <label for="infant-count">Infants &lt;2
+              <input id="infant-count" name="infants" type="number" min="0" step="1" value="0" required>
+            </label>
+          </div>
+          <small class="passenger-hint">No overall traveler limit. Children use the adult fare estimate. Infants are lap passengers; any infant fees are not included.</small>
+        </div>
+      </div>
+      <button class="search-btn" type="submit"><i class="fas fa-search"></i> Search flights</button>
+    </form>
+
+    <p class="booking-status" id="booking-status" role="status" aria-live="polite"></p>
+
+    <!-- Results header -->
+    <div class="results-header">
+      <div class="results-heading-copy">
+        <h2><i class="fas fa-plane"></i> Choose a flight</h2>
+        <p class="results-subtitle">Illustrative route-based fares and local arrival times, not live airline data.</p>
+      </div>
+      <div class="sort-badge"><i class="fas fa-tag"></i> Illustrative estimates</div>
+    </div>
+
+    <!-- Flight listings -->
+    <div class="flight-list" id="flight-results">
+      <!-- Flight 1 -->
+      <div class="flight-item" data-one-way-fare="690" data-round-trip-fare="980">
+        <div class="airline-info">
+          <div class="airline-icon"><i class="fas fa-plane"></i></div>
+          <div>
+            <div class="airline-name">Kenya Airways</div>
+            <div class="flight-number">KQ 102 · Direct</div>
+          </div>
+        </div>
+        <div class="flight-route">
+          <div class="departure">
+            <div class="time">08:15</div>
+            <div class="airport-code" data-route="origin">NBO</div>
+          </div>
+          <div class="flight-duration">
+            <i class="fas fa-long-arrow-alt-right"></i>
+            <span>9h 10m</span>
+            <span style="font-size:0.7rem;">non-stop</span>
+          </div>
+          <div class="arrival">
+            <div class="time">14:25</div>
+            <div class="airport-code" data-route="destination">LHR</div>
+          </div>
+        </div>
+        <div class="flight-price">
+          $690 <span>USD · one way / traveler</span>
+          <button class="book-btn" type="button">Select flight <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Flight 2 -->
+      <div class="flight-item" data-one-way-fare="730" data-round-trip-fare="1040">
+        <div class="airline-info">
+          <div class="airline-icon"><i class="fas fa-plane"></i></div>
+          <div>
+            <div class="airline-name">Jambojet + partners</div>
+            <div class="flight-number">JM 8702 + partner airlines · 1 stop</div>
+          </div>
+        </div>
+        <div class="flight-route">
+          <div class="departure">
+            <div class="time">10:45</div>
+            <div class="airport-code" data-route="origin">NBO</div>
+          </div>
+          <div class="flight-duration">
+            <i class="fas fa-long-arrow-alt-right"></i>
+            <span>10h 05m</span>
+            <span style="font-size:0.7rem;">1 stop</span>
+          </div>
+          <div class="arrival">
+            <div class="time">17:50</div>
+            <div class="airport-code" data-route="destination">LHR</div>
+          </div>
+        </div>
+        <div class="flight-price">
+          $730 <span>USD · one way / traveler</span>
+          <button class="book-btn" type="button">Select flight <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Flight 3 -->
+      <div class="flight-item" data-one-way-fare="745" data-round-trip-fare="1090">
+        <div class="airline-info">
+          <div class="airline-icon"><i class="fas fa-plane"></i></div>
+          <div>
+            <div class="airline-name">Ethiopian Airlines</div>
+            <div class="flight-number">Illustrative itinerary · connection</div>
+          </div>
+        </div>
+        <div class="flight-route">
+          <div class="departure">
+            <div class="time">18:20</div>
+            <div class="airport-code" data-route="origin">NBO</div>
+          </div>
+          <div class="flight-duration">
+            <i class="fas fa-long-arrow-alt-right"></i>
+            <span>9h 20m</span>
+            <span style="font-size:0.7rem;">connection estimate</span>
+          </div>
+          <div class="arrival">
+            <div class="time">00:40 <span style="font-size:0.7rem;">+1</span></div>
+            <div class="airport-code" data-route="destination">LHR</div>
+          </div>
+        </div>
+        <div class="flight-price">
+          $745 <span>USD · one way / traveler</span>
+          <button class="book-btn" type="button">Select flight <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <section class="reservation-panel" id="reservation-panel" aria-labelledby="reservation-title">
+      <h2 id="reservation-title"><i class="fas fa-ticket-alt"></i> Complete your booking</h2>
+      <p id="reservation-intro">Select a flight to continue.</p>
+      <ol class="booking-steps" aria-label="Booking progress">
+        <li class="is-current" data-booking-step="flight" aria-current="step">
+          <span class="booking-step-number">1</span><span>Flight</span>
+        </li>
+        <li data-booking-step="details">
+          <span class="booking-step-number">2</span><span>Traveler details</span>
+        </li>
+        <li data-booking-step="confirmation">
+          <span class="booking-step-number">3</span><span>Confirmation</span>
+        </li>
+      </ol>
+      <p class="reservation-summary" id="reservation-summary" aria-live="polite"></p>
+      <div class="booking-confirmation" id="booking-confirmation" role="status" hidden>
+        <h3>Trip details confirmed</h3>
+        <p>Your preview reference: <strong id="booking-reference"></strong></p>
+        <p id="confirmed-preferences"></p>
+        <p>No airline reservation has been created and no payment was taken.</p>
+      </div>
+      <form class="traveler-details" id="traveler-details-form" hidden>
+        <h3>Traveler details</h3>
+        <p>Enter each traveler’s details and the lead traveler’s contact information.</p>
+        <div class="traveler-fields" id="traveler-fields"></div>
+        <p class="preference-note">Per flight segment: Business +$1,000 and extra legroom +$150 per traveler. Seat availability and final airline pricing are not checked.</p>
+        <div class="contact-fields">
+          <label for="contact-email">Email address
+            <input id="contact-email" name="contactEmail" type="email" autocomplete="email" required>
+          </label>
+          <label for="contact-phone">Phone number
+            <input id="contact-phone" name="contactPhone" type="tel" autocomplete="tel" required>
+          </label>
+        </div>
+        <button class="confirm-booking-btn" type="submit">Confirm trip details</button>
+      </form>
+    </section>
+
+    <!-- Footer note / reassurance -->
+    <div class="footer-note">
+      <div class="secure-badge"><i class="fas fa-info-circle"></i> Prototype preview · live fares, booking, and payment are not connected</div>
+      <div class="contact-support"><i class="fas fa-headset"></i> +254781149405</div>
+    </div>
+  </div>
+  <script>
+    const searchForm = document.getElementById('flight-search');
+    const adultCountSelect = document.getElementById('adult-count');
+    const childCountSelect = document.getElementById('child-count');
+    const infantCountSelect = document.getElementById('infant-count');
+    const departInput = document.getElementById('depart-date');
+    const returnInput = document.getElementById('return-date');
+    const returnField = document.querySelector('.return-field');
+    const returnDivider = document.querySelector('.return-divider');
+    const multiCityFields = document.getElementById('multi-city-fields');
+    const multiCityLegs = document.getElementById('multi-city-legs');
+    const addLegButton = document.getElementById('add-leg-btn');
+    const legCount = document.getElementById('leg-count');
+    const statusMessage = document.getElementById('booking-status');
+    const reservationSummary = document.getElementById('reservation-summary');
+    const reservationIntro = document.getElementById('reservation-intro');
+    const travelerDetailsForm = document.getElementById('traveler-details-form');
+    const travelerFields = document.getElementById('traveler-fields');
+    const bookingConfirmation = document.getElementById('booking-confirmation');
+    const bookingReference = document.getElementById('booking-reference');
+    const confirmedPreferences = document.getElementById('confirmed-preferences');
+    const bookingSteps = Array.from(document.querySelectorAll('[data-booking-step]'));
+    const businessUpgradePerSegment = 1000;
+    const extraLegroomPerSegment = 150;
+    const airportCoordinates = {
+      NBO: [-1.319, 36.928],
+      MBA: [-4.034, 39.594],
+      ADD: [8.978, 38.799],
+      EBB: [0.042, 32.444],
+      KGL: [-1.969, 30.139],
+      DAR: [-6.878, 39.203],
+      JNB: [-26.136, 28.242],
+      CPT: [-33.971, 18.602],
+      CAI: [30.121, 31.406],
+      LOS: [6.577, 3.321],
+      ACC: [5.605, -0.167],
+      DOH: [25.273, 51.608],
+      DXB: [25.253, 55.365],
+      IST: [41.276, 28.732],
+      BOM: [19.089, 72.868],
+      DEL: [28.556, 77.100],
+      LHR: [51.470, -0.454],
+      LGW: [51.153, -0.182],
+      CDG: [49.010, 2.550],
+      AMS: [52.310, 4.768],
+      FRA: [50.037, 8.562],
+      FCO: [41.800, 12.238],
+      SIN: [1.364, 103.991],
+      BKK: [13.690, 100.750],
+      HND: [35.549, 139.779],
+      JFK: [40.640, -73.779],
+      YYZ: [43.677, -79.630]
+    };
+    const airportUtcOffsets = {
+      NBO: 3, MBA: 3, ADD: 3, EBB: 3, KGL: 2, DAR: 3,
+      JNB: 2, CPT: 2, CAI: 2, LOS: 1, ACC: 0, DOH: 3,
+      DXB: 4, IST: 3, BOM: 5.5, DEL: 5.5, LHR: 0, LGW: 0,
+      CDG: 1, AMS: 1, FRA: 1, FCO: 1, SIN: 8, BKK: 7,
+      HND: 9, JFK: -5, YYZ: -5
+    };
+    const today = new Date();
+    const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
+      .toISOString().slice(0, 10);
+    let nextLegId = 1;
+    let selectedBooking = null;
+
+    const requestedTripType = new URLSearchParams(window.location.search).get('tripType');
+    searchForm.querySelectorAll('input[name="tripType"]').forEach(function (radio) {
+      if (radio.value === requestedTripType) radio.checked = true;
+    });
+
+    departInput.min = localToday;
+    returnInput.min = localToday;
+
+    function tripType() {
+      return searchForm.elements.tripType.value;
+    }
+
+    function isRoundTrip() {
+      return tripType() === 'round-trip';
+    }
+
+    function isMultiCity() {
+      return tripType() === 'multi-city';
+    }
+
+    function updateBookingProgress(currentStep) {
+      const currentIndex = bookingSteps.findIndex(function (step) {
+        return step.dataset.bookingStep === currentStep;
+      });
+      bookingSteps.forEach(function (step, index) {
+        step.classList.toggle('is-current', index === currentIndex);
+        step.classList.toggle('is-complete', index < currentIndex);
+        if (index === currentIndex) {
+          step.setAttribute('aria-current', 'step');
+        } else {
+          step.removeAttribute('aria-current');
+        }
+      });
+    }
+
+    function clearSelectedBooking() {
+      if (!selectedBooking) return;
+      selectedBooking = null;
+      travelerDetailsForm.hidden = true;
+      bookingConfirmation.hidden = true;
+      reservationSummary.textContent = '';
+      reservationIntro.textContent = 'Select a flight for your updated route.';
+      updateBookingProgress('flight');
+    }
+
+    function formatDate(value) {
+      if (!value) return '';
+      return new Date(value + 'T00:00:00').toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function airportCode(value) {
+      const code = value.match(/\(([a-z]{3})\)/i);
+      if (code) return code[1].toUpperCase();
+      return value.trim().split(/\s+/).map(function (part) {
+        return part.replace(/[^a-z]/gi, '').slice(0, 1);
+      }).join('').slice(0, 3).toUpperCase() || '---';
+    }
+
+    function distanceBetweenAirports(origin, destination) {
+      const from = airportCoordinates[airportCode(origin)];
+      const to = airportCoordinates[airportCode(destination)];
+      if (!from || !to) return null;
+      const radians = Math.PI / 180;
+      const latitudeDifference = (to[0] - from[0]) * radians;
+      const longitudeDifference = (to[1] - from[1]) * radians;
+      const haversine = Math.sin(latitudeDifference / 2) ** 2 +
+        Math.cos(from[0] * radians) * Math.cos(to[0] * radians) *
+        Math.sin(longitudeDifference / 2) ** 2;
+      return 6371 * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+    }
+
+    function formatFlightDuration(minutes) {
+      return Math.floor(minutes / 60) + 'h ' +
+        String(Math.round(minutes % 60)).padStart(2, '0') + 'm est.';
+    }
+
+    function updateArrivalTime(flight, duration, origin, destination) {
+      const originCode = airportCode(origin);
+      const destinationCode = airportCode(destination);
+      const originOffset = airportUtcOffsets[originCode];
+      const destinationOffset = airportUtcOffsets[destinationCode];
+      const departure = flight.querySelector('.departure .time').textContent.match(/(\d{2}):(\d{2})/);
+      if (originOffset === undefined || destinationOffset === undefined || !departure) return;
+
+      const departureMinutes = Number(departure[1]) * 60 + Number(departure[2]);
+      const arrivalMinutes = departureMinutes - originOffset * 60 +
+        duration + destinationOffset * 60;
+      const dayOffset = Math.floor(arrivalMinutes / 1440);
+      const localMinutes = ((arrivalMinutes % 1440) + 1440) % 1440;
+      const arrival = flight.querySelector('.arrival .time');
+      arrival.textContent = String(Math.floor(localMinutes / 60)).padStart(2, '0') + ':' +
+        String(localMinutes % 60).padStart(2, '0');
+      if (dayOffset !== 0) {
+        const dayIndicator = document.createElement('span');
+        dayIndicator.style.fontSize = '0.7rem';
+        dayIndicator.textContent = dayOffset > 0 ? '+' + dayOffset : String(dayOffset);
+        arrival.append(' ', dayIndicator);
+      }
+    }
+
+    function createLegField(labelText, type, value, iconClass, name, legId) {
+      const field = document.createElement('div');
+      field.className = 'search-field';
+
+      const icon = document.createElement('i');
+      icon.className = iconClass;
+      icon.setAttribute('aria-hidden', 'true');
+
+      const content = document.createElement('div');
+      content.className = 'field-content';
+
+      const label = document.createElement('label');
+      label.textContent = labelText;
+
+      const input = document.createElement('input');
+      input.type = type;
+      input.name = name;
+      input.required = true;
+      input.value = value || '';
+      input.min = type === 'date' ? localToday : '';
+      if (type === 'text') {
+        input.setAttribute('list', name === 'multiOrigin' ?
+          'origin-airport-options' : 'destination-airport-options');
+      }
+      label.htmlFor = name + '-' + legId;
+      input.id = label.htmlFor;
+      if (type === 'text') input.placeholder = 'City or airport';
+
+      content.append(label, input);
+      field.append(icon, content);
+      return { field: field, input: input };
+    }
+
+    function updateLegDates() {
+      const legs = Array.from(multiCityLegs.children);
+      legs.forEach(function (leg, index) {
+        const dateInput = leg.querySelector('input[type="date"]');
+        const previousDate = index === 0 ? localToday :
+          legs[index - 1].querySelector('input[type="date"]').value || localToday;
+        dateInput.min = previousDate;
+      });
+    }
+
+    function updateLegControls() {
+      const count = multiCityLegs.children.length;
+      legCount.textContent = count + ' of 6 flights';
+      addLegButton.disabled = count >= 6;
+      multiCityLegs.querySelectorAll('.remove-leg-btn').forEach(function (button) {
+        button.disabled = count <= 2;
+      });
+    }
+
+    function addLeg(values) {
+      if (multiCityLegs.children.length >= 6) return;
+      const legNumber = multiCityLegs.children.length + 1;
+      const legId = nextLegId;
+      nextLegId += 1;
+      const leg = document.createElement('div');
+      leg.className = 'multi-city-leg';
+      leg.setAttribute('aria-label', 'Flight ' + legNumber);
+
+      const previousLeg = multiCityLegs.lastElementChild;
+      const fromValue = values && values.from ? values.from :
+        (previousLeg ? previousLeg.querySelector('[data-leg-field="to"]').value : '');
+      const from = createLegField('From', 'text', fromValue, 'fas fa-map-marker-alt', 'multiOrigin', legId);
+      const to = createLegField('To', 'text', values && values.to, 'fas fa-map-marker-alt', 'multiDestination', legId);
+      const date = createLegField('Depart', 'date', values && values.date, 'fas fa-calendar-alt', 'multiDepartDate', legId);
+      from.input.dataset.legField = 'from';
+      to.input.dataset.legField = 'to';
+
+      const removeButton = document.createElement('button');
+      removeButton.type = 'button';
+      removeButton.className = 'remove-leg-btn';
+      removeButton.textContent = 'Remove';
+      removeButton.setAttribute('aria-label', 'Remove flight ' + legNumber);
+      removeButton.addEventListener('click', function () {
+        leg.remove();
+        Array.from(multiCityLegs.children).forEach(function (item, index) {
+          item.setAttribute('aria-label', 'Flight ' + (index + 1));
+          item.querySelector('.remove-leg-btn').setAttribute('aria-label', 'Remove flight ' + (index + 1));
+        });
+        updateLegDates();
+        updateLegControls();
+      });
+
+      date.input.addEventListener('change', updateLegDates);
+      leg.append(from.field, to.field, date.field, removeButton);
+      multiCityLegs.append(leg);
+      updateLegDates();
+      updateLegControls();
+    }
+
+    function getMultiCityLegs() {
+      return Array.from(multiCityLegs.children).map(function (leg) {
+        return {
+          from: leg.querySelector('[data-leg-field="from"]').value.trim(),
+          to: leg.querySelector('[data-leg-field="to"]').value.trim(),
+          date: leg.querySelector('input[type="date"]').value
+        };
+      });
+    }
+
+    function validateMultiCityLegs() {
+      const legs = getMultiCityLegs();
+      for (let index = 0; index < legs.length; index += 1) {
+        const leg = legs[index];
+        const dateInput = multiCityLegs.children[index].querySelector('input[type="date"]');
+        if (!leg.from || !leg.to || !leg.date) {
+          statusMessage.textContent = 'Complete the origin, destination, and date for every flight.';
+          statusMessage.classList.add('error');
+          multiCityLegs.children[index].querySelector('input:invalid')?.focus();
+          return false;
+        }
+        if (leg.date < (index === 0 ? localToday : legs[index - 1].date)) {
+          statusMessage.textContent = 'Each flight date must be on or after the previous flight date.';
+          statusMessage.classList.add('error');
+          dateInput.focus();
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function updateTripFields() {
+      const multiCity = isMultiCity();
+      const roundTrip = isRoundTrip();
+      document.querySelectorAll('.single-trip-field').forEach(function (field) {
+        field.hidden = multiCity;
+      });
+      document.querySelectorAll('.single-trip-divider').forEach(function (divider) {
+        divider.hidden = multiCity;
+      });
+      multiCityFields.hidden = !multiCity;
+      multiCityFields.querySelectorAll('input').forEach(function (input) {
+        input.disabled = !multiCity;
+        input.required = multiCity;
+      });
+      returnField.hidden = !roundTrip;
+      returnDivider.hidden = !roundTrip;
+      searchForm.elements.origin.required = !multiCity;
+      searchForm.elements.destination.required = !multiCity;
+      departInput.required = !multiCity;
+      returnInput.required = roundTrip;
+      if (roundTrip && departInput.value) returnInput.min = departInput.value;
+      updateRouteEstimates();
+    }
+
+    function updateEstimatedFares() {
+      document.querySelectorAll('.flight-item').forEach(function (flight) {
+        const oneWayFare = Number(flight.dataset.oneWayFare);
+        const fare = isRoundTrip() ? Number(flight.dataset.roundTripFare) :
+          oneWayFare * (isMultiCity() ? multiCityLegs.children.length : 1);
+        flight.querySelector('.flight-price span').textContent =
+          'USD · illustrative · ' + (isRoundTrip() ? 'return' : isMultiCity() ?
+            'multi-city estimate / traveler' : 'one way / traveler');
+        flight.querySelector('.flight-price').firstChild.textContent = '$' + fare + ' ';
+      });
+    }
+
+    function updateRouteEstimates() {
+      const legs = isMultiCity() ? getMultiCityLegs() : [{
+        from: searchForm.elements.origin.value,
+        to: searchForm.elements.destination.value
+      }];
+      const firstLeg = legs[0];
+      if (firstLeg) {
+        document.querySelectorAll('[data-route="origin"]').forEach(function (node) {
+          node.textContent = airportCode(firstLeg.from);
+        });
+        document.querySelectorAll('[data-route="destination"]').forEach(function (node) {
+          node.textContent = airportCode(firstLeg.to);
+        });
+      }
+
+      if (!legs.length || legs.some(function (leg) { return !leg.from || !leg.to; })) {
+        updateEstimatedFares();
+        return;
+      }
+      const routeEstimates = legs.map(function (leg) {
+        const distance = distanceBetweenAirports(leg.from, leg.to);
+        return distance === null ? null : {
+          fare: Math.max(120, Math.round(100 + distance * 0.086)),
+          duration: Math.max(45, Math.round(distance / 800 * 60 + 45))
+        };
+      });
+      if (routeEstimates.some(function (estimate) { return estimate === null; })) {
+        document.querySelectorAll('.flight-item').forEach(function (flight) {
+          flight.querySelector('.flight-price').firstChild.textContent = '— ';
+          flight.querySelector('.flight-price span').textContent = 'No route estimate available';
+          flight.querySelector('.flight-duration span').textContent = 'Estimate unavailable';
+          flight.querySelector('.book-btn').disabled = true;
+        });
+        statusMessage.classList.add('error');
+        statusMessage.textContent = 'Choose a listed airport to see an illustrative route estimate.';
+        return;
+      }
+
+      const oneWayFare = Math.round(routeEstimates.reduce(function (total, estimate) {
+        return total + estimate.fare;
+      }, 0) / routeEstimates.length);
+      const returnFare = Math.round(oneWayFare * 1.42);
+      const flightFareAdjustments = [0, 40, 55];
+      const returnFareAdjustments = [0, 60, 110];
+      const durationAdjustments = [0, 150, 150];
+      document.querySelectorAll('.flight-item').forEach(function (flight, index) {
+        flight.dataset.oneWayFare = oneWayFare + flightFareAdjustments[index];
+        flight.dataset.roundTripFare = returnFare + returnFareAdjustments[index];
+        const duration = routeEstimates[0].duration + durationAdjustments[index];
+        flight.querySelector('.flight-duration span').textContent = formatFlightDuration(duration);
+        updateArrivalTime(flight, duration, firstLeg.from, firstLeg.to);
+        flight.querySelector('.book-btn').disabled = false;
+      });
+      if (statusMessage.textContent.indexOf('Choose a listed airport') === 0) {
+        statusMessage.classList.remove('error');
+        statusMessage.textContent = '';
+      }
+      updateEstimatedFares();
+    }
+
+    function getPassengerCounts() {
+      const counts = {
+        adults: adultCountSelect.valueAsNumber,
+        children: childCountSelect.valueAsNumber,
+        infants: infantCountSelect.valueAsNumber
+      };
+      if (!Number.isSafeInteger(counts.adults) || counts.adults < 1 ||
+          !Number.isSafeInteger(counts.children) || counts.children < 0 ||
+          !Number.isSafeInteger(counts.infants) || counts.infants < 0) {
+        return null;
+      }
+      return counts;
+    }
+
+    function syncPassengerCounts() {
+      const counts = getPassengerCounts();
+      if (!counts) {
+        statusMessage.classList.add('error');
+        statusMessage.textContent = 'Enter whole-number passenger counts, including at least one adult.';
+        return;
+      }
+
+      if (statusMessage.textContent === 'Enter whole-number passenger counts, including at least one adult.') {
+        statusMessage.classList.remove('error');
+        statusMessage.textContent = '';
+      }
+
+      if (selectedBooking && !travelerDetailsForm.hidden) {
+        selectedBooking.adults = counts.adults;
+        selectedBooking.children = counts.children;
+        selectedBooking.infants = counts.infants;
+        selectedBooking.travelers = counts.adults + counts.children + counts.infants;
+        selectedBooking.farePayingTravelers = counts.adults + counts.children;
+        updateTravelerFields(counts);
+        updateReservationSummary();
+      }
+    }
+
+    function updateReservationSummary() {
+      if (!selectedBooking) return;
+      const travelerCards = Array.from(travelerFields.children);
+      const seatedTravelers = travelerCards.filter(function (card) {
+        return card.dataset.passengerType !== 'infant';
+      });
+      const businessTravelers = seatedTravelers.filter(function (card) {
+        return card.querySelector('[data-traveler-field="cabin"]').value === 'business';
+      }).length;
+      const extraLegroomTravelers = seatedTravelers.filter(function (card) {
+        return card.querySelector('[data-traveler-field="extra-legroom"]').checked;
+      }).length;
+      const baseFare = selectedBooking.farePerTraveler * selectedBooking.farePayingTravelers;
+      const businessTotal = businessTravelers * businessUpgradePerSegment * selectedBooking.segments;
+      const extraLegroomTotal = extraLegroomTravelers * extraLegroomPerSegment * selectedBooking.segments;
+      const total = baseFare + businessTotal + extraLegroomTotal;
+      const passengerSummary = [
+        selectedBooking.adults + (selectedBooking.adults === 1 ? ' adult' : ' adults'),
+        selectedBooking.children + (selectedBooking.children === 1 ? ' child' : ' children'),
+        selectedBooking.infants + (selectedBooking.infants === 1 ? ' infant' : ' infants')
+      ].join(' · ');
+      reservationSummary.textContent = selectedBooking.airline + ' · ' + selectedBooking.tripName +
+        ' · ' + selectedBooking.itinerary + ' · ' +
+        passengerSummary +
+        ' · Base fares: $' + baseFare.toLocaleString() +
+        ' · Business upgrade: $' + businessTotal.toLocaleString() +
+        ' · Extra legroom: $' + extraLegroomTotal.toLocaleString() +
+        ' · Estimated total: $' + total.toLocaleString() +
+        (selectedBooking.infants ? ' · Lap infant fare not estimated' : '');
+    }
+
+    function createTravelerSelect(labelText, id, name, fieldName, options, selectedValue) {
+      const label = document.createElement('label');
+      label.htmlFor = id;
+      label.appendChild(document.createTextNode(labelText));
+
+      const select = document.createElement('select');
+      select.id = id;
+      select.name = name;
+      select.dataset.travelerField = fieldName;
+      options.forEach(function (option) {
+        const optionElement = document.createElement('option');
+        optionElement.value = option.value;
+        optionElement.textContent = option.label;
+        select.appendChild(optionElement);
+      });
+      select.value = selectedValue || options[0].value;
+      label.appendChild(select);
+      return label;
+    }
+
+    function updateTravelerFields(counts) {
+      const currentPreferences = {};
+      Array.from(travelerFields.children).forEach(function (card) {
+        const key = card.dataset.passengerType + card.dataset.passengerNumber;
+        const birthDate = card.querySelector('[data-traveler-field="birth-date"]');
+        const previous = {
+          name: card.querySelector('[data-traveler-field="name"]').value,
+          birthDate: birthDate ? birthDate.value : ''
+        };
+        if (card.dataset.passengerType !== 'infant') {
+          previous.cabin = card.querySelector('[data-traveler-field="cabin"]').value;
+          previous.seat = card.querySelector('[data-traveler-field="seat"]').value;
+          previous.extraLegroom = card.querySelector('[data-traveler-field="extra-legroom"]').checked;
+        }
+        currentPreferences[key] = previous;
+      });
+      travelerFields.replaceChildren();
+      const passengers = [];
+      const countByType = {
+        adult: counts.adults,
+        child: counts.children,
+        infant: counts.infants
+      };
+      ['adult', 'child', 'infant'].forEach(function (type) {
+        const count = countByType[type];
+        for (let index = 0; index < count; index += 1) {
+          passengers.push({ type: type, number: index + 1 });
+        }
+      });
+
+      passengers.forEach(function (passenger, index) {
+        const type = passenger.type;
+        const passengerNumber = passenger.number;
+        const previous = currentPreferences[type + passengerNumber] || {};
+        const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
+        const card = document.createElement('section');
+        card.className = 'traveler-card';
+        card.dataset.passengerType = type;
+        card.dataset.passengerNumber = String(passengerNumber);
+        card.setAttribute('aria-labelledby', 'traveler-title-' + type + '-' + passengerNumber);
+
+        const heading = document.createElement('h4');
+        heading.id = 'traveler-title-' + type + '-' + passengerNumber;
+        heading.textContent = typeLabel + ' ' + passengerNumber;
+
+        const nameLabel = document.createElement('label');
+        const nameInput = document.createElement('input');
+        nameLabel.htmlFor = 'traveler-name-' + type + '-' + passengerNumber;
+        nameLabel.appendChild(document.createTextNode('Full name'));
+        nameInput.id = nameLabel.htmlFor;
+        nameInput.name = 'travelerName' + typeLabel + passengerNumber;
+        nameInput.type = 'text';
+        nameInput.autocomplete = type === 'adult' && passengerNumber === 1 ? 'name' : 'off';
+        nameInput.required = true;
+        nameInput.dataset.travelerField = 'name';
+        nameInput.value = previous.name || '';
+        nameLabel.appendChild(nameInput);
+
+        card.append(heading, nameLabel);
+        if (type !== 'adult') {
+          const birthDateLabel = document.createElement('label');
+          const birthDateInput = document.createElement('input');
+          const datePickerControl = document.createElement('div');
+          const datePickerButton = document.createElement('button');
+          const calendarIcon = document.createElement('i');
+          birthDateLabel.htmlFor = 'traveler-birth-date-' + type + '-' + passengerNumber;
+          birthDateLabel.appendChild(document.createTextNode('Date of birth'));
+          birthDateInput.id = birthDateLabel.htmlFor;
+          birthDateInput.name = 'travelerBirthDate' + typeLabel + passengerNumber;
+          birthDateInput.type = 'date';
+          birthDateInput.required = true;
+          birthDateInput.max = selectedBooking.departureDate;
+          birthDateInput.dataset.travelerField = 'birth-date';
+          birthDateInput.value = previous.birthDate || '';
+          datePickerControl.className = 'date-picker-control';
+          datePickerControl.appendChild(birthDateInput);
+          datePickerButton.className = 'date-picker-button';
+          datePickerButton.type = 'button';
+          datePickerButton.setAttribute('aria-label',
+            'Open calendar for ' + typeLabel + ' ' + passengerNumber + ' date of birth');
+          calendarIcon.className = 'fas fa-calendar-alt';
+          calendarIcon.setAttribute('aria-hidden', 'true');
+          datePickerButton.appendChild(calendarIcon);
+          datePickerButton.addEventListener('click', function () {
+            if (typeof birthDateInput.showPicker === 'function') {
+              birthDateInput.showPicker();
+            } else {
+              birthDateInput.focus();
+              birthDateInput.click();
+            }
+          });
+          datePickerControl.appendChild(datePickerButton);
+          card.append(birthDateLabel, datePickerControl);
+        }
+
+        if (type === 'infant') {
+          const infantNote = document.createElement('p');
+          infantNote.className = 'preference-note';
+          infantNote.textContent = 'Lap infant; no separate seat or fare is estimated.';
+          card.appendChild(infantNote);
+        } else {
+          const preferences = document.createElement('div');
+          preferences.className = 'traveler-preferences';
+          preferences.appendChild(createTravelerSelect(
+            'Cabin class',
+            'traveler-cabin-' + type + '-' + passengerNumber,
+            'travelerCabin' + typeLabel + passengerNumber,
+            'cabin',
+            [
+              { value: 'economy', label: 'Economy' },
+              { value: 'business', label: 'Business' }
+            ],
+            previous.cabin
+          ));
+          preferences.appendChild(createTravelerSelect(
+            'Seat preference',
+            'traveler-seat-' + type + '-' + passengerNumber,
+            'travelerSeat' + typeLabel + passengerNumber,
+            'seat',
+            [
+              { value: 'none', label: 'No preference' },
+              { value: 'aisle', label: 'Aisle' },
+              { value: 'window', label: 'Window' },
+              { value: 'middle', label: 'Middle' }
+            ],
+            previous.seat
+          ));
+
+          const legroomLabel = document.createElement('label');
+          const legroomInput = document.createElement('input');
+          legroomLabel.className = 'checkbox-label';
+          legroomLabel.htmlFor = 'traveler-legroom-' + type + '-' + passengerNumber;
+          legroomInput.id = legroomLabel.htmlFor;
+          legroomInput.name = 'travelerExtraLegroom' + typeLabel + passengerNumber;
+          legroomInput.type = 'checkbox';
+          legroomInput.dataset.travelerField = 'extra-legroom';
+          legroomInput.checked = Boolean(previous.extraLegroom);
+          legroomLabel.append(legroomInput, document.createTextNode('Request extra legroom'));
+          preferences.appendChild(legroomLabel);
+          card.appendChild(preferences);
+        }
+        travelerFields.appendChild(card);
+      });
+    }
+
+    function validateMinorBirthDates() {
+      for (let index = 0; index < travelerFields.children.length; index += 1) {
+        const card = travelerFields.children[index];
+        const type = card.dataset.passengerType;
+        if (type === 'adult') continue;
+        const birthDateInput = card.querySelector('[data-traveler-field="birth-date"]');
+        const age = ageOnDate(birthDateInput.value, selectedBooking.departureDate);
+        const validAge = type === 'child' ? age >= 2 && age <= 11 : age >= 0 && age < 2;
+        if (!validAge) {
+          statusMessage.classList.add('error');
+          statusMessage.textContent = type === 'child' ?
+            'Children must be 2 to 11 years old on the departure date.' :
+            'Infants must be under 2 years old on the departure date.';
+          birthDateInput.focus();
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function ageOnDate(birthDate, travelDate) {
+      if (!birthDate || !travelDate) return -1;
+      const birth = new Date(birthDate + 'T00:00:00');
+      const travel = new Date(travelDate + 'T00:00:00');
+      let age = travel.getFullYear() - birth.getFullYear();
+      if (travel.getMonth() < birth.getMonth() ||
+          (travel.getMonth() === birth.getMonth() && travel.getDate() < birth.getDate())) {
+        age -= 1;
+      }
+      return age;
+    }
+
+    travelerFields.addEventListener('change', updateReservationSummary);
+    adultCountSelect.addEventListener('change', syncPassengerCounts);
+    childCountSelect.addEventListener('change', syncPassengerCounts);
+    infantCountSelect.addEventListener('change', syncPassengerCounts);
+    syncPassengerCounts();
+
+    addLegButton.addEventListener('click', function () {
+      addLeg();
+      clearSelectedBooking();
+      updateRouteEstimates();
+    });
+
+    searchForm.querySelectorAll('input[name="tripType"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        clearSelectedBooking();
+        updateTripFields();
+      });
+    });
+    searchForm.elements.origin.addEventListener('change', function () {
+      clearSelectedBooking();
+      updateRouteEstimates();
+    });
+    searchForm.elements.destination.addEventListener('change', function () {
+      clearSelectedBooking();
+      updateRouteEstimates();
+    });
+    multiCityLegs.addEventListener('change', function () {
+      if (!isMultiCity()) return;
+      clearSelectedBooking();
+      updateRouteEstimates();
+    });
+    addLeg({ from: searchForm.elements.origin.value, to: searchForm.elements.destination.value, date: departInput.value });
+    addLeg({ from: searchForm.elements.destination.value });
+    updateTripFields();
+
+    departInput.addEventListener('change', function () {
+      clearSelectedBooking();
+      returnInput.min = departInput.value || localToday;
+      if (returnInput.value && returnInput.value < returnInput.min) {
+        returnInput.value = '';
+      }
+    });
+    returnInput.addEventListener('change', clearSelectedBooking);
+
+    searchForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (isMultiCity() && !validateMultiCityLegs()) return;
+      if (isRoundTrip() && returnInput.value < departInput.value) {
+        statusMessage.textContent = 'Please choose a return date on or after your departure date.';
+        statusMessage.classList.add('error');
+        returnInput.focus();
+        return;
+      }
+      const legs = isMultiCity() ? getMultiCityLegs() : [{
+        from: searchForm.elements.origin.value,
+        to: searchForm.elements.destination.value
+      }];
+      clearSelectedBooking();
+      document.querySelectorAll('[data-route="origin"]').forEach(function (node) {
+        node.textContent = airportCode(legs[0].from);
+      });
+      document.querySelectorAll('[data-route="destination"]').forEach(function (node) {
+        node.textContent = airportCode(legs[0].to);
+      });
+      statusMessage.classList.remove('error');
+      const routeSummary = legs.map(function (leg) {
+        return leg.from + ' to ' + leg.to;
+      }).join(' · ');
+      statusMessage.textContent = 'Route updated to ' + routeSummary +
+        (isRoundTrip() ? ' · return' : isMultiCity() ? ' · multi-city' : ' · one way') +
+        '. Listed schedules and fares are illustrative.';
+      document.querySelector('.results-header').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.querySelectorAll('.book-btn').forEach(function (button) {
+      button.addEventListener('click', function () {
+        if (isMultiCity() && !validateMultiCityLegs()) {
+          multiCityLegs.querySelector('input:invalid')?.focus();
+          return;
+        }
+        if (!isMultiCity() && !departInput.value) {
+          statusMessage.textContent = 'Choose a departure date before selecting a flight.';
+          statusMessage.classList.add('error');
+          departInput.focus();
+          return;
+        }
+        if (isRoundTrip() && (!returnInput.value || returnInput.value < departInput.value)) {
+          statusMessage.textContent = 'Choose a valid return date before selecting a flight.';
+          statusMessage.classList.add('error');
+          returnInput.focus();
+          return;
+        }
+        const flight = button.closest('.flight-item');
+        const airline = flight.querySelector('.airline-name').textContent;
+        const legs = isMultiCity() ? getMultiCityLegs() : [{
+          from: searchForm.elements.origin.value,
+          to: searchForm.elements.destination.value,
+          date: departInput.value
+        }];
+        const oneWayFare = Number(flight.dataset.oneWayFare);
+        const fare = isRoundTrip() ? Number(flight.dataset.roundTripFare) :
+          oneWayFare * (isMultiCity() ? legs.length : 1);
+        const passengerCounts = getPassengerCounts();
+        if (!passengerCounts) {
+          const invalidCount = [adultCountSelect, childCountSelect, infantCountSelect].find(function (input) {
+            return !input.checkValidity();
+          });
+          statusMessage.classList.add('error');
+          statusMessage.textContent = 'Enter whole-number passenger counts, including at least one adult.';
+          (invalidCount || adultCountSelect).focus();
+          return;
+        }
+        const travelers = passengerCounts.adults + passengerCounts.children + passengerCounts.infants;
+        const tripName = isRoundTrip() ? 'Return' : isMultiCity() ? 'Multi-city' : 'One way';
+        const returnText = isRoundTrip() ? ' · Return ' + formatDate(returnInput.value) : '';
+        const itinerary = isMultiCity() ? legs.map(function (leg) {
+          return leg.from + ' to ' + leg.to + ' on ' + formatDate(leg.date);
+        }).join(' · ') : legs[0].from + ' to ' + legs[0].to +
+          ' · Depart ' + formatDate(departInput.value) + returnText;
+        selectedBooking = {
+          airline: airline,
+          tripName: tripName,
+          itinerary: itinerary,
+          farePerTraveler: fare,
+          travelers: travelers,
+          adults: passengerCounts.adults,
+          children: passengerCounts.children,
+          infants: passengerCounts.infants,
+          farePayingTravelers: passengerCounts.adults + passengerCounts.children,
+          departureDate: isMultiCity() ? legs[0].date : departInput.value,
+          segments: isMultiCity() ? legs.length : isRoundTrip() ? 2 : 1
+        };
+        statusMessage.classList.remove('error');
+        statusMessage.textContent = 'Flight selected. Enter traveler details to continue.';
+        reservationIntro.textContent = 'Review your itinerary and add traveler details.';
+        bookingConfirmation.hidden = true;
+        updateBookingProgress('details');
+        updateTravelerFields(passengerCounts);
+        updateReservationSummary();
+        travelerDetailsForm.hidden = false;
+        document.getElementById('reservation-panel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
+
+    travelerDetailsForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (!validateMinorBirthDates()) return;
+      const preferenceSummary = Array.from(travelerFields.children).map(function (card) {
+        const type = card.dataset.passengerType;
+        const passengerNumber = card.dataset.passengerNumber;
+        if (type === 'infant') return 'Infant ' + passengerNumber + ': lap infant';
+        const cabin = card.querySelector('[data-traveler-field="cabin"]').value;
+        const seat = card.querySelector('[data-traveler-field="seat"]').value;
+        const extraLegroom = card.querySelector('[data-traveler-field="extra-legroom"]').checked;
+        const requestedOptions = [cabin === 'business' ? 'Business' : 'Economy'];
+        if (extraLegroom) requestedOptions.push('extra legroom requested');
+        if (seat !== 'none') requestedOptions.push(seat + ' seat requested');
+        return type.charAt(0).toUpperCase() + type.slice(1) + ' ' +
+          passengerNumber + ': ' + requestedOptions.join(', ');
+      }).join(' · ');
+      const reference = 'PREVIEW-' + Date.now().toString(36).toUpperCase().slice(-6) +
+        '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+      bookingReference.textContent = reference;
+      confirmedPreferences.textContent = 'Requested preferences: ' + preferenceSummary;
+      bookingConfirmation.hidden = false;
+      travelerDetailsForm.hidden = true;
+      travelerDetailsForm.reset();
+      reservationIntro.textContent = 'Your trip details are confirmed.';
+      updateBookingProgress('confirmation');
+      statusMessage.classList.remove('error');
+      statusMessage.textContent = 'Trip details confirmed. Reference: ' + reference + '. No airline reservation was created.';
+      bookingConfirmation.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  </script>
+</body>
+</html>
+```
